@@ -1,0 +1,24 @@
+{
+  "name": "gestor-to-do",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ebata-play55/gestor-to-do.git"
+  },
+  "author": "ebata",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ebata-play55/gestor-to-do/issues"
+  },
+  "homepage": "https://github.com/ebata-play55/gestor-to-do#readme"
+}

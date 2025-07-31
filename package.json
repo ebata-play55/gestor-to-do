@@ -3,22 +3,21 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
-  "dependencies": {
-    "express": "^5.1.0"
-  },
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ebata-play55/gestor-to-do.git"
   },
-  "author": "ebata",
+  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ebata-play55/gestor-to-do/issues"
   },
-  "homepage": "https://github.com/ebata-play55/gestor-to-do#readme"
+  "homepage": "https://github.com/ebata-play55/gestor-to-do#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
 }

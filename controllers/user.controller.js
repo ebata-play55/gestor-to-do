@@ -1,132 +1,115 @@
-const { users, todos } = require('../models/memory')
+class UserController {
 
-//=== USERS =====================================
-
-function getUsers(req, res) {
-    res.send(users)
-}
-
-function getUserId(req, res) {
-
-    const id = parseInt(req.params.id)
-
-    let encontrado
-
-    users.forEach(user => {
-        if (user.id === id)
-            encontrado = user
-    })
-
-    if (encontrado)
-        res.send(encontrado)
-
-    else
-        res.send('user not found!')
-
-}
-
-function postUSer(req, res) {
-    users.push(req.body)
-    res.send('usuario criado')
-}
-
-//=== TODOS =====================================
-
-function getTodos(req, res) {
-    res.json(todos)
-}
-
-function getTodoId(id) {
-
-    let encontrado
-    todos.forEach(todo => {
-        if (todo.id === id)
-            encontrado = todo
-    })
-
-    if (encontrado)
-        return encontrado
-    else
-        return 'todo not found!'
-}
-
-function postTodo(req, res) {
-
-    todos.push(req.body)
-    res.send('Todo criado')
-
-}
-
-function putTodo(req, res) {
-
-    const id = parseInt(req.params.id)
-
-    let todo = getTodoId(id)
-
-    if (typeof todo === "object") {
-        todo.usuarioId = req.body.usuarioId
-        todo.titulo = req.body.titulo
-        todo.status = req.body.status
-
-        res.send('todo atualizado')
-    }
-    else
-        res.send(todo)
-}
-
-function patchTodo(req, res) {
-
-    const id = parseInt(req.params.id)
-
-    let todo = getTodoId(id)
-
-    if (typeof todo === "object") {
-
-        if (req.body.usuarioId !== undefined)
-            todo.usuarioId = req.body.usuarioId
-
-        if (req.body.titulo !== undefined)
-            todo.titulo = req.body.titulo
-
-        if (req.body.status !== undefined)
-            todo.status = req.body.status
-
-        res.send('todo atualizado')
-    }
-    else
-        res.send(todo)
-
-}
-
-function deleteTodo(req, res){
-    const id = parseInt(req.params.id)
-
-    let index;
-    let remover = false;
-    
-    for(let i=0; i<todos.length; i++){
-        if(todos[i].id === id){
-            index = i;
-            remover = true;
-        }
+    constructor(conn) {
+        this.conn = conn
     }
 
-    if(remover)
-        res.send(todos.splice(index, 1))
-    
-    else
-        res.send('todo not found!')
+    async getUsers() {
+        return await new Promise((resolve, reject) => {
+            this.conn.query('select * from users', (err, result) => {
+                
+                if (err) return reject(err)
 
+                return resolve(result)
+
+            })
+        })
+    }
+
+    async getUserId(id) {
+        return await new Promise((resolve, reject) => {
+            this.conn.query(`select * from users where id = ${id}`, (err, result) => {
+
+                if (err) return reject(err)
+
+                if (result.length === 0) return resolve('user not found!')
+
+                return resolve(result)
+            })
+        })
+    }
+
+    async postUSer({ name, email, senha }) {
+        return await new Promise((resolve, reject) => {
+            this.conn.query(`insert into users (name, email, senha) values ("${name}","${email}", "${senha}");`, (err, result) => {
+
+                if (err) reject(err)
+
+                return resolve("usuário criado!")
+
+            })
+        })
+    }
+
+    async updatePartial(id, { name, email, senha }) {
+        
+        let user = await this.getUserId(id)
+
+        if (typeof user !== 'object')
+            return user
+
+        let body //da pra melhorar isso utilizando array com join, evita ter que remover o undefined no inicio caso aconteça
+        if (name) body = `name = "${name}"`
+
+        if (email) body += `, email = "${email}"`
+
+        if (senha) body += `, senha = "${senha}"`
+
+        body = body.replace("undefined, ", "")
+
+        user = await new Promise((resolve, reject) => { 
+            this.conn.query(`update users set ${body} where id = ${id}`, (err, result) => {
+                if (err) return reject(err)
+                return resolve(result)
+            })
+        })
+
+        if(user.affectedRows > 0)
+            return await this.getUserId(id)
+        
+        return user
+
+    }
+
+    async update(id, { name, email, senha }) {
+        
+        let user = await this.getUserId(id)
+
+        if (typeof user !== 'object')
+            return user
+
+        if(name === undefined || email === undefined || senha === undefined)
+            return "{status: campos obrigatórios em falta! Verfique name, email e senha}"
+        
+
+        user = await new Promise((resolve, reject) => { 
+            this.conn.query(`update users set name = "${name}", email = "${email}", senha = "${senha}" where id = ${id}`, (err, result) => {
+                if (err) return reject(err)
+                return resolve(result)
+            })
+        })
+
+        if(user.affectedRows > 0)
+            return await this.getUserId(id)
+        
+        return user
+
+    }
+
+    remove(id) {
+        return new Promise(async (resolve, reject) => {
+
+            const user = await this.getUserId(id)
+
+            if (typeof user !== 'object')
+                return reject(user)
+
+            await this.conn.query(`delete from users where id = ${id}`, (err, result) => {
+                if (err) return reject(err)
+                return resolve(result)
+            })
+        })
+    }
 }
 
-module.exports = {
-    getUsers,
-    getUserId,
-    postUSer,
-    getTodos,
-    getTodoId,
-    postTodo,
-    putTodo,
-    patchTodo,
-    deleteTodo
-}
+module.exports = UserController

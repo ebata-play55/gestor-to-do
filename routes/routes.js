@@ -1,33 +1,49 @@
 const express = require('express')
 const router = express.Router()
-const {getUsers, getUserId, postUSer, getTodos, getTodoId, postTodo, putTodo, patchTodo, deleteTodo } = require('../controllers/user.controller')
+
+const conn = require('../database/connection')
+
+const UserController = require('../controllers/user.controller')
+const userController = new UserController(conn)
+
+const TodoController = require('../controllers/todo.controller')
+const todoController = new TodoController(conn)
 
 //=== USERS =====================================
 
-router.get('/users', getUsers)
+router.get('/users', (req, res) => {
+    userController.getUsers().then(result => res.json(result)).catch(err => res.json(err))
+})
 
-router.get('/user/:id', getUserId)
+router.get('/user/:id', (req, res) => {
+    const id = parseInt(req.params.id)
 
-router.post('/user', postUSer)
+    userController.getUserId(id).then(result => res.json(result)).catch(err => res.json(err))
 
-//=== TODOS =====================================
-
-router.get('/todos', getTodos)
-
-router.get('/todo/:id', (req, res) => {
-
-    const resp = getTodoId(parseInt(req.params.id))
-
-    res.send(resp)
+    // res.send( await userController.getUserId2(id))
 
 })
 
-router.post('/todo', postTodo)
+router.post('/user', (req, res) => {
+    userController.postUSer(req.body).then(result => res.json(result)).catch(err => res.json(err))
+})
 
-router.put('/todo/:id', putTodo)
+router.patch('/user/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    userController.updatePartial(id, req.body).then(result => res.json(result)).catch(err => res.json(err))
+})
 
-router.patch('/todo/:id', patchTodo)
+router.put('/user/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    userController.update(id, req.body).then(result => res.json(result)).catch(err => res.json(err))
+})
 
-router.delete('/todo/:id', deleteTodo)
+router.delete('/user/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    userController.remove(id).then(result => res.json(result)).catch(err => res.json(err))
+})
+
+//=== TODOS =====================================
+
 
 module.exports = router

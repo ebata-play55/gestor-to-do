@@ -45,5 +45,32 @@ router.delete('/user/:id', (req, res) => {
 
 //=== TODOS =====================================
 
+router.get('/todos', (req, res) => {
+    todoController.findAll().then(result => res.json(result)).catch(err => res.json(err))
+})
+
+router.get('/todo/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    todoController.findOneById(id).then(result => res.json(result)).catch(err => res.json(err))
+})
+
+router.post('/todo', (req, res) => {
+    todoController.post(req.body).then(result => res.json(result)).catch(err => res.json(err))
+})
+
+router.patch('/todo/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    todoController.patch(id, req.body).then(result => res.json(result)).catch(err => res.json(err))
+})
+
+router.put('/todo/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    todoController.put(id, req.body).then(result => res.json(result)).catch(err => res.json(err))
+})
+
+router.delete('/todo/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    todoController.remove(id).then(result => res.json(result)).catch(err => res.json(err))
+})
 
 module.exports = router
